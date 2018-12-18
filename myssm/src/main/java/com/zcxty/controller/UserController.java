@@ -78,8 +78,44 @@ public class UserController {
         return "allUser";
     }
     @RequestMapping("/searchUser")
-    public String searchUser(String username,Model model) {
-    	System.out.println(username);
+    public String searchUser(@RequestParam(value="page", defaultValue="1"),String username,Model model) {
+    	List<User> list = userService.queryAllUser();
+        List<String> ids=new ArrayList<String>();
+        List<User> result=null;
+        Map<String,String> param=new HashMap<String,String>();
+        if(username!=null) {
+        	ids.add(username);
+          param.put(username, username);
+        //System.out.println(username);
+        // 存放过滤结果的列表
+      
+        // 使用lambda表达式过滤出结果并放到result列表里，written by zhangchao
+        result = list.stream()
+                .filter((User u) -> ids.contains(u.getUsername()))
+                .collect(Collectors.toList());
+
+        // 打印结果列表
+        /*if (result != null && !result.isEmpty()) {
+            result.forEach((User u) -> System.out.println(u.getId() + "  " + u.getUsername()));
+         }*/
+        }else {
+        	result=list;
+        	param.remove(username);
+        }
+        int count=result.size();
+        int pageSize=2;
+        PageNumber pn=new PageNumber(count,pageSize=2,page, param);
+        //从第几条数据开始
+        if(page>pn.pageNum) {
+        	page=pn.pageNum;
+        }else if(page<=0) {
+            page=1;
+        }
+         int firstIndex = (page - 1) * pageSize;
+         //到第几条数据结束
+         int lastIndex = page * pageSize;
+         model.addAttribute("list", result.subList(firstIndex, lastIndex));
+         model.addAttribute("page",pn.getPage());
     	return "redirect:/user/searchUser";
     }
 	@RequestMapping("/toAddUser")
