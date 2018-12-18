@@ -80,7 +80,7 @@ public class UserController {
     @RequestMapping("/searchUser")
     public String searchUser(String username,Model model) {
     	System.out.println(username);
-    	return "redirect:/user/allUser";
+    	return "redirect:/user/searchUser";
     }
 	@RequestMapping("/toAddUser")
     public String toAddPaper() {
